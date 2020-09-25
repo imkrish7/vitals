@@ -46,9 +46,7 @@ const Home = ({ navigation }) => {
           </View>
         </View>
       </View>
-      <View style={styles.footer}>
-        <Footer />
-      </View>
+      
       <TouchableOpacity onPress={() => navigation.navigate('Measure')} style={styles.floating}>
         <Text style={styles.btn}>Measure Now</Text>
       </TouchableOpacity>
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
     flex: 0.2,
   },
   body: {
-    flex: 0.72,
+    flex: 0.8,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
@@ -90,20 +88,22 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 90 / 2,
     right: 10,
-    bottom: 60,
-    backgroundColor: "rgba(241, 242, 246,1.0)",
+    bottom: 10,
+    backgroundColor: "rgba(189, 195, 199,1.0)",
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 4,
+    borderTopColor: "#ff7979",
+    borderBottomColor: "rgba(34, 166, 179,0.7)",
+    borderLeftColor: "#1B1464",
+    borderRightColor: "#1B1464",
   },
   btn: {
-    width: 90,
-    height: 90,
-    fontSize: 15
-  },
-  footer: {
-    flex: 0.08,
-  },
+    textAlign: "center",
+    fontSize: 15,
+    color: "#fff"
+  }
 });
 
 export default Home;
