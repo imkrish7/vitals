@@ -6,26 +6,44 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
   TouchableOpacity,
   Text
 } from 'react-native';
-
-
+import { connect  } from 'react-redux';
 
 
 import Top from './Top';
 import DatePicker from './DatePicker';
-import Footer from './Footer';
 import Temperature from './Temperature';
 import Blood from './BloodPressure';
 import Oximeter from './Oximeter';
 import Cam from './Cam';
+// actions
+import { getBP, getSPO, getTemperature} from '../actions/userActions'
 
-const Home = ({ navigation }) => {
+
+class Home extends Component {
+
+  constructor(props){
+    super(props);
+  }
+
+  componentDidMount(){
+    this.props.getBP({})
+    this.props.getSPO({})
+    this.props.getTemperature({})
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    console.log(JSON.stringify(this.props))
+  }
+
+
+  render(){
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -47,11 +65,12 @@ const Home = ({ navigation }) => {
         </View>
       </View>
       
-      <TouchableOpacity onPress={() => navigation.navigate('Measure')} style={styles.floating}>
+      <TouchableOpacity onPress={() => this.props.navigation.navigate('Measure')} style={styles.floating}>
         <Text style={styles.btn}>Measure Now</Text>
       </TouchableOpacity>
     </View>
   );
+  }
 };
 
 const styles = StyleSheet.create({
@@ -106,4 +125,20 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Home;
+const mapStateToProps = state =>{
+  return {
+    bpResponse: state.getBPResponse,
+    temperatureResponse: state.getTemperatureResponse,
+    spoResponse: state.getSPOResponse
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    getBP: params => dispatch(getBP(params)),
+    getSPO: params => dispatch(getSPO(params)),
+    getTemperature: params => dispatch(getTemperature(params))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

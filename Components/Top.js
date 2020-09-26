@@ -29,11 +29,9 @@ const Top = () => {
 
 const Styles = StyleSheet.create({
 	container: {
-		backgroundColor: "#1B1464",
+		backgroundColor: "rgba(48, 51, 107,1)",
 		padding: 10,
 		flex: 1,
-		borderTopRightRadius: 15,
-		borderTopLeftRadius: 15
 	},
 
 	header: {

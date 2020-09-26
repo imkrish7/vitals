@@ -34,6 +34,7 @@ const Oximeter = ({ Icon, value, loading, mesure }) => {
 							</React.Fragment>}
 				</View>
 			</View>
+			
 		</View>
 	);
 };

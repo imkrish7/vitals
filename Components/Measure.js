@@ -1,69 +1,150 @@
-import React, {useState} from 'react';
-import { View, Text , StyleSheet , Button} from 'react-native';
+import React, { Component } from 'react';
+import { View, Text , StyleSheet , Button, ActivityIndicator} from 'react-native';
+import { connect } from 'react-redux';
 // Icons
 import Icon from 'react-native-vector-icons/dist/FontAwesome'
 import Fontisto from 'react-native-vector-icons/dist/Fontisto'
 import Material from 'react-native-vector-icons/dist/MaterialCommunityIcons'
-
+// Custom Cards
 import Temperature from './Cards/Temperature'
 import Oximeter from './Cards/Oximeter'
 import Blood from './Cards/BloodPressure'
+// redux actions
+import { createBP, createTemperature, createSPO } from '../actions/userActions';
 
+// Icons component
 const temperatureIcon = () => <Icon name="thermometer" size={30} color="rgba(19, 15, 64,0.7)"/>
 const bloodPressureIcon = () => <Fontisto name="blood-drop" size={30} color="rgba(19, 15, 64,0.7)" />
 const oximeterIcon =() => <Material name="heart-pulse" size={30} color="rgba(19, 15, 64,0.7)" />
 
 
-const Measure  = () => {
-	const [temperature, setTemperature] = useState("0")
-	const [tempLoading, setTempLoading] = useState(false)
-	const [bpLoading, setBPLoading] = useState(false)
-	const [spLoading, setSPLoading] = useState(false)
-	const [blood, setBlood] = useState({min: 0, max: 0})
-	const [oximeter, setOximeter] = useState({spo2: 0, bpm: 0})
-	const [send, setSend] = useState(false)
+class Measure extends Component {
 
-	const tempMesurement = () => {
-		setTempLoading(true)
+	constructor(props){
+		super(props);
+		this.state = {
+			temperature: 0,
+			tempLoading: false,
+			bpLoading: false,
+			spLoading: false,
+			blood: { min: 0, max: 0},
+			oximeter: { spo2: 0, bpm: 0},
+			updated: false,
+			bpSent: false,
+			spSent: false,
+			tempSent: false
+		}
+	}
+
+	tempMesurement = () => {
+		this.setState({ tempLoading: true})
 		let temp =Math.random() * (97 - 115) + 97.6
 		let round = temp.toFixed(2)
-		setTemperature(round)
-		setTempLoading(false)
-		setSend(true)
+		this.setState({
+			temperature: round,
+			tempLoading: false,
+			updated: true,
+			requestSent: false
+		})
 	}
 
-	const bpMesurement = () => {
-		setBPLoading(true)
+	bpMesurement = () => {
+		this.setState({ bpLoading : true})
 		let minBP = Math.ceil(Math.random() * 100 + 60)
 		let maxBP = Math.ceil(Math.random() * (120 - 180) + 120)
-		setBlood({min: minBP, max: maxBP})
-		setBPLoading(false)
+		this.setState({
+			blood: { min: minBP, max: maxBP},
+			bpLoading: false,
+			updated: true
+		})
 	}
 
-	const spo2Mesurement = () => {
-		setSPLoading(true)
+	spo2Mesurement = () => {
+		this.setState({
+			spLoading: true
+		})
 		let spo2 = Math.ceil(Math.random() * (90-100) + 90)
 		let bpm = Math.ceil(Math.random() * (60-100) + 60)
-		setOximeter({spo2, bpm})
-		setSPLoading(false)
+		this.setState({
+			oximeter: { spo2, bpm},
+			spLoading: false,
+			updated: true
+		})
 	}
 
+	onComplete = () => {
+		let params = {}
+		if(this.state.temperature>0){
+			params = { temperature: this.state.temperature}
+			this.props.createTemperature(params)
+			this.setState({bpSent: true})
+		}
+
+		if(this.state.blood.min>0){
+			params = {}
+			params = {min: this.state.blood.min, max: this.state.blood.max}
+			this.props.createBP(params)
+			this.setState({spSent: true})
+		}
+
+		if(this.state.oximeter.spo2>0){
+			params = {}
+			params = { spo2: this.state.oximeter.spo2, bpm: this.state.oximeter.bpm}
+			this.props.createSPO(params);
+			this.setState({tempSent: true})
+		}
+		this.setState({requestSent: true})
+	}
+
+	componentDidUpdate(prevProps, prevState){
+		let request = []
+		console.log(this.props)
+		if(this.state.spSent && this.props.spResponse.success ){
+			request.push(true)
+		}
+		if(this.state.bpSent && this.props.bpResponse.success ){
+			request.push(true)
+		}
+		if(this.state.tempSent && this.props.temperatureResponse.success ){
+			request.push(true)
+		}
+
+		if(this.state.spSent && this.props.spResponse.error ){
+			request.push(false)
+		}
+		if(this.state.bpSent && this.props.bpResponse.error ){
+			request.push(false)
+		}
+		if(this.state.tempSent && this.props.temperatureResponse.error ){
+			request.push(false)
+		}
+
+		let result = request.every(entity => entity == true)
+
+		if((this.state.spSent || this.state.bpSent || this.state.tempSent) && result){
+			this.props.navigation.navigate("Home")
+		}
+	}
+
+
+	render(){
 	return (
 		<View style={styles.container}>
 			<View style={styles.row}>
-				<Temperature loading={tempLoading} mesure={tempMesurement} title={"Body"} value={temperature} desc={"Wear Thermometer to view Temperature"} Icon={temperatureIcon} />
+				<Temperature loading={this.state.tempLoading} mesure={this.tempMesurement} title={"Body"} value={this.state.temperature} desc={"Wear Thermometer to view Temperature"} Icon={temperatureIcon} />
 			</View>
 			<View style={styles.row}>
-				<Blood loading={bpLoading} mesure={bpMesurement} value={blood} Icon={bloodPressureIcon}/>
+				<Blood loading={this.state.bpLoading} mesure={this.bpMesurement} value={this.state.blood} Icon={bloodPressureIcon}/>
 			</View>
 			<View style={styles.row}>
-				<Oximeter loading={spLoading} mesure={spo2Mesurement} value={oximeter} Icon={oximeterIcon} />
+				<Oximeter loading={this.state.spLoading} mesure={this.spo2Mesurement} value={this.state.oximeter} Icon={oximeterIcon} />
 			</View>
 			<View style={styles.btnwrapper}>
-				<Button disabled={!send} title="Complete" color="#1B1464"/>
+				<Text onPress={this.onComplete} style={[styles.btn, this.state.updated && styles.activate]}>{this.state.requestSent ? <ActivityIndicator size="small" color="#fff"/> : "Complete"}</Text>
 			</View>
 		</View>
 	)
+	}
 }
 
 const styles = StyleSheet.create({
@@ -81,6 +162,36 @@ const styles = StyleSheet.create({
 	},
 	btnwrapper: {
 		height: 60
+	},
+	btn: {
+		textAlign: "center",
+		backgroundColor: "#ccc",
+		fontSize: 20,
+		paddingBottom: 5,
+		paddingTop: 5,
+		borderRadius: 5,
+		color: "#ecf0f1"
+	},
+	activate: {
+		backgroundColor: "rgba(19, 15, 64,0.7)",
+		color: "#fff"
 	}
 })
-export default Measure;
+
+const mapStateToProps = state => {
+	return {
+		bpResponse: state.createBPResponse,
+		spResponse: state.createSPOResponse,
+		temperatureResponse: state.createTemperatureResponse
+	}
+}
+
+const mapDistpatchToProps = dispatch => {
+	return {
+		createBP: (params) => dispatch(createBP(params)),
+		createSPO: (params) => dispatch(createSPO(params)),
+		createTemperature: (params) => dispatch(createTemperature(params))
+	}
+}
+
+export default connect(mapStateToProps, mapDistpatchToProps)(Measure);
