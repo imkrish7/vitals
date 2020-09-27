@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import { connect  } from 'react-redux';
 
-
 import Top from './Top';
 import DatePicker from './DatePicker';
 import Temperature from './Temperature';
@@ -27,21 +26,60 @@ import { getBP, getSPO, getTemperature} from '../actions/userActions'
 
 
 class Home extends Component {
-
   constructor(props){
     super(props);
+    this.state = {
+      bp: [],
+      spo: [],
+      temperature: [],
+      date: new Date().toISOString()
+    }
   }
 
   componentDidMount(){
-    this.props.getBP({})
-    this.props.getSPO({})
-    this.props.getTemperature({})
+    const date = new Date(Date.now()).toLocaleDateString()
+    const { navigation } = this.props;
+    this.extractData(date)
+    this.focusListener = navigation.addListener('focus',()=>{
+      this.extractData(date)
+    });
+  }
+
+  extractData = (date) => {
+    const params = { date }
+    this.props.getBP(params)
+    this.props.getSPO(params)
+    this.props.getTemperature(params)
+  }
+
+  compare = (prevProps, currentProps) => {
+      if(prevProps && currentProps && currentProps.success && currentProps.data && currentProps.data != prevProps.data ){
+        return true
+      }
+      return false;
   }
 
   componentDidUpdate(prevProps, prevState){
-    console.log(JSON.stringify(this.props))
+    if(this.compare(prevProps.bpResponse, this.props.bpResponse)){
+      this.setState({bp: [...this.props.bpResponse.data.data]})
+    }
+    if(this.compare(prevProps.spoResponse, this.props.spoResponse)){
+      this.setState({spo: [...this.props.spoResponse.data.data]})
+    }
+    if(this.compare(prevProps.temperatureResponse, this.props.temperatureResponse)){
+      this.setState({temperature: [...this.props.temperatureResponse.data.data]})
+    }
   }
 
+  selectDate = (date) => {
+      date = new Date(date).toLocaleDateString()
+      this.extractData(date);
+  }
+
+  componentWillUnmount(){
+    this.focusListener()
+    this.setState({bp: [], spo: [], temperature: [] })
+  }
 
   render(){
   return (
@@ -51,20 +89,21 @@ class Home extends Component {
       </View>
       <View style={styles.body}>
         <View style={styles.date}>
-          <DatePicker />
+          <DatePicker selectDate={this.selectDate} date={this.state.date} />
         </View>
         <View style={styles.items}>
           <View style={styles.row}>
-            <Temperature />
-            <Oximeter />
+          <View style={styles.col}>
+            <Temperature data={this.state.temperature} />
+            <Oximeter data={this.state.spo} />
           </View>
-          <View style={styles.row}>
-            <Blood />
+          <View style={styles.col}>
+            <Blood data={this.state.bp} />
             <Cam />
           </View>
+          </View>
         </View>
-      </View>
-      
+      </View>    
       <TouchableOpacity onPress={() => this.props.navigation.navigate('Measure')} style={styles.floating}>
         <Text style={styles.btn}>Measure Now</Text>
       </TouchableOpacity>
@@ -99,6 +138,11 @@ const styles = StyleSheet.create({
   },
   row: {
     flex: 1,
+    flexDirection: "row",
+    justifyContent: "center"
+  },
+  col: {
+    flex: 0.5,
     justifyContent: 'space-between',
   },
   floating: {

@@ -38,7 +38,7 @@ class Measure extends Component {
 
 	tempMesurement = () => {
 		this.setState({ tempLoading: true})
-		let temp =Math.random() * (97 - 115) + 97.6
+		let temp =Math.random() * (115 - 97.6) + 97.6
 		let round = temp.toFixed(2)
 		this.setState({
 			temperature: round,
@@ -50,8 +50,8 @@ class Measure extends Component {
 
 	bpMesurement = () => {
 		this.setState({ bpLoading : true})
-		let minBP = Math.ceil(Math.random() * 100 + 60)
-		let maxBP = Math.ceil(Math.random() * (120 - 180) + 120)
+		let minBP = Math.ceil((Math.random() * (90-60))) + 60
+		let maxBP = Math.ceil((Math.random() * (180 - 120))) + 90
 		this.setState({
 			blood: { min: minBP, max: maxBP},
 			bpLoading: false,
@@ -63,8 +63,8 @@ class Measure extends Component {
 		this.setState({
 			spLoading: true
 		})
-		let spo2 = Math.ceil(Math.random() * (90-100) + 90)
-		let bpm = Math.ceil(Math.random() * (60-100) + 60)
+		let spo2 = Math.ceil(Math.random() * (100-90) + 90)
+		let bpm = Math.ceil(Math.random() * (100-60) + 60)
 		this.setState({
 			oximeter: { spo2, bpm},
 			spLoading: false,
@@ -98,7 +98,6 @@ class Measure extends Component {
 
 	componentDidUpdate(prevProps, prevState){
 		let request = []
-		console.log(this.props)
 		if(this.state.spSent && this.props.spResponse.success ){
 			request.push(true)
 		}
@@ -140,7 +139,7 @@ class Measure extends Component {
 				<Oximeter loading={this.state.spLoading} mesure={this.spo2Mesurement} value={this.state.oximeter} Icon={oximeterIcon} />
 			</View>
 			<View style={styles.btnwrapper}>
-				<Text onPress={this.onComplete} style={[styles.btn, this.state.updated && styles.activate]}>{this.state.requestSent ? <ActivityIndicator size="small" color="#fff"/> : "Complete"}</Text>
+				<Text disabled={!this.state.updated} onPress={this.onComplete} style={[styles.btn, this.state.updated && styles.activate]}>{this.state.requestSent ? <ActivityIndicator size="small" color="#fff"/> : "Complete"}</Text>
 			</View>
 		</View>
 	)

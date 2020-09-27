@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/dist/AntDesign';
 import moment from 'moment';
 
 const Top = () => {
+	// moment.locale('IN')
 	return(
 		<View style={Styles.container}>
 			<View style={Styles.header}>

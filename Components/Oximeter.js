@@ -3,8 +3,14 @@ import { View, StyleSheet, Text } from 'react-native';
 import { LineChart, YAxis, Grid } from 'react-native-svg-charts';
 import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import * as shape from 'd3-shape';
-const Oximeter = () => {
-	const data = [50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80];
+import { oximeterForamtting } from '../utils/dataFomatting'
+
+
+const Oximeter = ({data}) => {
+	let formattedData = oximeterForamtting(data)
+	let spo = formattedData.spo;
+	let bpm = formattedData.bpm
+	data = [...formattedData.data];
 
 	const contentInset = { top: 10, bottom: 10 };
 	return (
@@ -18,7 +24,7 @@ const Oximeter = () => {
 					data={data}
 					contentInset={contentInset}
 					svg={{
-						fill: 'grey',
+						fill: 'rgba(48, 51, 107,1.0)',
 						fontSize: 10,
 					}}
 					numberOfTicks={3}
@@ -37,14 +43,14 @@ const Oximeter = () => {
 				<View style={styles.cat}>
 					<Text style={styles.title}>SpO2</Text>
 					<View style={styles.valWrap}>
-						<Text style={styles.val}>98</Text>
+						<Text style={styles.val}>{spo}</Text>
 						<Text style={styles.unit}>%</Text>
 					</View>
 				</View>
 				<View style={styles.cat}>
 					<Text style={styles.title}>PB</Text>
 					<View style={styles.valWrap}>
-						<Text style={styles.val}>60</Text>
+				<Text style={styles.val}>{bpm}</Text>
 						<Text style={styles.unit}>bpm</Text>
 					</View>
 				</View>

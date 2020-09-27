@@ -1,14 +1,16 @@
 import React from 'react';
-// import { LineChart } from 'react-native-chart-kit';
 import { View, StyleSheet, Text, Dimensions } from 'react-native';
 import { LineChart, YAxis, Grid } from 'react-native-svg-charts'
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import * as shape from 'd3-shape'
 import Material from 'react-native-vector-icons/dist/MaterialCommunityIcons';
+// formating data
+import { temperatureForamtting } from '../utils/dataFomatting';
 
-
-const Temperature = () => {
-	const data = [50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80]
+const Temperature = ({data}) => {
+	let formattedData = temperatureForamtting(data)
+	let average = formattedData.average;
+	data = [...formattedData.data]
 	const contentInset = { top: 10, bottom: 10 }
 	return (
 		<View style={styles.container}>
@@ -21,7 +23,7 @@ const Temperature = () => {
                     data={data}
                     contentInset={contentInset}
                     svg={{
-                        fill: 'grey',
+                        fill: 'rgb(255, 0, 0)',
                         fontSize: 10,
                     }}
                     numberOfTicks={3}
@@ -36,7 +38,7 @@ const Temperature = () => {
 					</LineChart>
 			</View>
 			<View style={styles.summery}>
-				<Text style={styles.textWrapper}><Text style={styles.tempText}>98.6</Text><Material name="temperature-fahrenheit" size={15} color="#fff"/></Text>
+				<Text style={styles.textWrapper}><Text style={styles.tempText}>{average}</Text><Material name="temperature-fahrenheit" size={15} color="#fff"/></Text>
 			</View>
 		</View>
 	);

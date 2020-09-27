@@ -4,8 +4,16 @@ import { LineChart, YAxis, Grid } from 'react-native-svg-charts'
 import * as shape from 'd3-shape'
 import Icon from 'react-native-vector-icons/dist/Feather'
 
-const BloodPressure = () => {
-	const data = [50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80]
+// data formatting
+import { bloodForamtting } from '../utils/dataFomatting';
+
+
+
+const BloodPressure = ({data}) => {
+	let formattedData = bloodForamtting(data)
+	let min = formattedData.min;
+	let max = formattedData.max;
+	data = formattedData.data;
 
 	const contentInset = { top: 10, bottom: 10 }
 	return(
@@ -19,7 +27,7 @@ const BloodPressure = () => {
                     data={data}
                     contentInset={contentInset}
                     svg={{
-                        fill: 'grey',
+                        fill: 'rgba(34, 166, 179,1)',
                         fontSize: 10,
                     }}
                     numberOfTicks={3}
@@ -35,8 +43,8 @@ const BloodPressure = () => {
 			</View>
 			<View style={styles.summary}>
 				<Text style={styles.summaryText}>
-					<Text style={styles.max}>120</Text>/
-					<Text style={styles.min}>90</Text>
+				<Text style={styles.max}>{max}</Text>/
+				<Text style={styles.min}>{min}</Text>
 				</Text>
 				<Text style={styles.unit}>mmHg</Text>
 			</View>

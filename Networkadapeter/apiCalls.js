@@ -1,12 +1,16 @@
 import axios from 'axios';
 
-
 export const apiRequest = (dispatch, params, url, requestType, successActions, loadingActions, errorActions) => {
 	let headers = { 'Content-Type': 'application/json' };
 	let defaultUrl = '';
 	defaultUrl = 'https://cryptic-ravine-14675.herokuapp.com';
 
-	let reqObj = { method: requestType, url: defaultUrl + url, data: JSON.stringify(params), headers };
+	let reqObj = { method: requestType, url: defaultUrl + url, headers };
+	if(requestType=="POST"){
+		reqObj['data'] = JSON.stringify(params)
+	}else{
+		reqObj["params"] = params
+	}
 
 	if (dispatch && loadingActions) dispatch(loadingActions(true));
 
